@@ -1,4 +1,5 @@
 {% extends 'workshop_app/base.html' %}
+{% load custom_filters %}
 
 {% block title %}
     Login
@@ -7,46 +8,56 @@
 {% block content %}
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-md-offset-6">
+            <div class="col-md-6">
                 <div class="card">
-                    <div class="card-body">
-                        <form class="px-3 py-3" method="post">
-                        {% csrf_token %}
-                        {% if form.errors %}
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <div class="alert alert-dismissible alert-danger">
-                                        <button type="button" class="close" data-dismiss="alert">
-                                            <i class="fa fa-close"></i>
-                                        </button>
-                                        <strong>{{ error|escape }}</strong>
-                                    </div>
-                                {% endfor %}
-                            {% endfor %}
-                            {% for error in form.non_field_errors %}
-                                <div class="alert alert-dismissible alert-danger">
-                                    <button type="button" class="close" data-dismiss="alert">
-                                        <i class="fa fa-close"></i>
-                                    </button>
-                                    <strong>{{ error|escape }}</strong>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                        <div class="form-group">
-                          <label for="id_username">Username</label>
-                          {{ form.username }}
-                        </div>
-                        <div class="form-group">
-                          <label for="id_password">Password</label>
-                          {{ form.password }}
-                        </div>
-                        <button type="submit" class="btn btn-primary">Sign in</button>
-                        </form>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'workshop_app:register' %}">New around here? Sign up</a>
-                        <a class="dropdown-item" href="{% url 'password_reset' %}">Forgot password?</a>
+                    <div class="card-header">
+                        <h3 class="text-center">Login</h3>
                     </div>
-                </div>  
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.non_field_errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="id_username">Username</label>
+                                {{ form.username|add_class:"form-control" }}
+                                {% if form.username.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.username.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="id_password">Password</label>
+                                {{ form.password|add_class:"form-control" }}
+                                {% if form.password.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.password.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                        </form>
+                    </div>
+                    <div class="card-footer text-center">
+                        <small class="text-muted">
+                            <a href="{% url 'password_reset' %}">Forgot password?</a>
+                        </small>
+                        <br>
+                        <small class="text-muted">
+                            New around here? <a href="{% url 'workshop_app:register' %}">Sign up</a>
+                        </small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
