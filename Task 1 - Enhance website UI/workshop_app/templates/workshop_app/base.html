@@ -123,6 +123,7 @@
     </footer>
 
     <script>
+        //these will run server-side using toastr. appears erroneously as client-side otherwise
         {% if messages %}
             {% for message in messages %}
                 toastr[{% if message.tags %} "{{ message.tags }}" {% else %} "info" {% endif %}]("{{ message }}");
