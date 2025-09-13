@@ -1,6 +1,6 @@
 # Tasks Overview
 
-This repository contains three deliverables completed as part of the assignment. Use this README to navigate to each task and understand what it includes.
+This repository contains three deliverables for Python completed as part of the internship tasks. Use this README to navigate to each task and understand what it includes.
 
 ## Task 1 — Enhance website UI
 Path: `Task 1 - Enhance website UI/`
@@ -18,6 +18,8 @@ Highlights:
 - Status pages and Propose Workshop polished to match the theme
 
 Instructions and detailed changes: See `Task 1 - Enhance website UI/README.md`.
+
+Live Demo link : https://drive.google.com/file/d/1k_KLMx4F4qGJFEgFAnQ88Avek2BwKpAs/view?usp=sharing
 
 ---
 
@@ -49,6 +51,7 @@ A short research plan for evaluating open-source AI models to analyze student Py
 From the `Task 1 - Enhance website UI/` folder:
 
 ```bat
+cd Task 1 - Enhance website UI
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver

@@ -17,6 +17,38 @@
 * Workshop Related Features
     > Instructors can Accept, Reject or Delete workshops based on their preference, also they can postpone a workshop based on coordinators request.
 
+## Quick start 
+
+1) Navigate to the folder
+
+```bat
+cd Task 1 - Enhance website UI
+```
+
+2) Install dependencies
+
+```bat
+pip install -r requirements.txt
+```
+
+3) Run migrations and start the server
+
+```bat
+python manage.py migrate
+python manage.py runserver
+```
+
+4) Visit the app
+
+- http://127.0.0.1:8000/
+- Public statistics: http://127.0.0.1:8000/statistics/public
+
+
+For detailed setup, see `docs/Getting_Started.md`.
+
+### Live Demo link
+
+https://drive.google.com/file/d/1k_KLMx4F4qGJFEgFAnQ88Avek2BwKpAs/view?usp=sharing
 
 ## 2025 UI Refresh – What Changed
 
@@ -101,25 +133,4 @@ This pass focused on a cohesive dark theme, mobile usability, and polishing high
 
 ---
 
-## Quick start 
 
-1) Install dependencies
-
-```bat
-pip install -r requirements.txt
-```
-
-2) Run migrations and start the server
-
-```bat
-python manage.py migrate
-python manage.py runserver
-```
-
-3) Visit the app
-
-- http://127.0.0.1:8000/
-- Public statistics: http://127.0.0.1:8000/statistics/public
-
-
-For detailed setup, see `docs/Getting_Started.md`.
