@@ -1,140 +1,190 @@
 {% extends 'workshop_app/base.html' %}
+{% load custom_filters %}
 
-{% block title %} Statistics {% endblock %}
+{% block title %}Statistics{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-4 col-xl-3 mb-4">
             <form method="GET">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h3><u>Filters</u></h3>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{% url 'statistics_app:public' %}" class="btn btn-outline-info">
-                                    <i class="fa fa-times"></i>&nbsp;Clear
-                                </a>
-                            </div>
-                        </div>
+                <div class="card card-dark h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Filters</h5>
+                        <a href="{% url 'statistics_app:public' %}" class="btn btn-sm btn-outline-light">
+                            <i class="fa fa-times"></i> Clear
+                        </a>
                     </div>
                     <div class="card-body">
-                        <div>From date: {{form.from_date}}</div>
-                        <div>To date: {{form.to_date}}</div>
-                        <div>Workshop: {{form.workshop_type}}</div>
-                        <div>State: {{form.state}}</div>
-                        <div>{{form.sort.help_text}}: {{form.sort}}</div>
+                        <div class="form-group mb-3">
+                            <label>From date:</label>
+                            {{ form.from_date|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>To date:</label>
+                            {{ form.to_date|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Workshop:</label>
+                            {{ form.workshop_type|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>State:</label>
+                            {{ form.state|add_class:"form-control" }}
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>{{ form.sort.help_text }}:</label>
+                            {{ form.sort|add_class:"form-control" }}
+                        </div>
                         {% if request.user.is_authenticated %}
-                        <div>{{form.show_workshops.help_text}}: {{form.show_workshops}}</div>
+                        <div class="form-group form-check mb-3 d-flex align-items-center">
+                            {{ form.show_workshops }}
+                            <label class="form-check-label ml-2 mb-0">{{ form.show_workshops.help_text }}</label>
+                        </div>
                         {% endif %}
-                        <br>
-                        <div class="row justify-content-center">
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fa fa-eye"></i>&nbsp;View
-                                </button>
-                            </div>
-                            <div class="col-md-6">
-                                <button type="submit" class="btn btn-info" name="download" value="download">
-                                    <i class="fa fa-download"></i>&nbsp;Download
-                                </button>
-                            </div>
+                        <div class="d-flex">
+                            <button type="submit" class="btn btn-theme-info flex-fill mr-3">
+                                <i class="fa fa-eye"></i> View
+                            </button>
+                            <button type="submit" class="btn btn-theme-success flex-fill" name="download" value="download">
+                                <i class="fa fa-download"></i> Download
+                            </button>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
-        <div class="col">
-            <div class="row">
-                <div class="col-md-6">
-                    {% include "statistics_app/paginator.html" %}
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-info" id="state_graph">
-                        <i class="fa fa-bar-chart"></i>&nbsp;State chart
-                    </button>
-                </div>
-                <div class="col-md-3">
-                    <button class="btn btn-info" id="type_graph">
-                        <i class="fa fa-bar-chart"></i>&nbsp;Workshops chart
-                    </button>
+
+        <!-- Results & Charts -->
+        <div class="col-lg-8 col-xl-9">
+            <div class="card card-dark mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Charts</h5>
+                    <div>
+                        <button class="btn btn-theme mr-2" id="state_graph"><i class="fa fa-bar-chart"></i> State chart</button>
+                        <button class="btn btn-theme" id="type_graph"><i class="fa fa-bar-chart"></i> Workshops chart</button>
+                    </div>
                 </div>
             </div>
-            <table class="table table-responsive-sm">
-                <thead>
-                    <tr>
-                        <th>Sr No.</th>
-                        <th>Coordinator Name</th>
-                        <th>Institute Name</th>
-                        <th>Instructor Name</th>
-                        <th>Workshop Name</th>
-                        <th>Workshop Date</th>
-                    </tr>
-                </thead>
-                {% csrf_token %}
-                {% for workshop in objects %}
-                    <tbody>
-                        <tr>
-                            <td>{{ forloop.counter0|add:objects.start_index}}</td>
-                            <td>{{ workshop.coordinator.get_full_name | capfirst }}</td>
-                            <td>{{ workshop.coordinator.profile.institute | capfirst }}</td>
-                            <td>{{ workshop.instructor.get_full_name | capfirst }}</td>
-                            <td>{{ workshop.workshop_type.name }}</td>
-                            <td>{{ workshop.date | date}}</td>
-                        </tr>
-                    </tbody>
-                {% endfor %}
-            </table>
-            {% include "statistics_app/paginator.html" %}
+
+            <div class="card card-dark">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Upcoming Workshops</h5>
+                    <small class="text-muted">Showing {{ objects.start_index }}–{{ objects.end_index }} of {{ objects.paginator.count }}</small>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Sr. No.</th>
+                                <th>Coordinator Name</th>
+                                <th>Institute Name</th>
+                                <th>Instructor Name</th>
+                                <th>Workshop Name</th>
+                                <th>Workshop Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% csrf_token %}
+                            {% for workshop in objects %}
+                            <tr>
+                                <td>{{ forloop.counter0|add:objects.start_index}}</td>
+                                <td>{{ workshop.coordinator.get_full_name|capfirst }}</td>
+                                <td>{{ workshop.coordinator.profile.institute|capfirst }}</td>
+                                <td>{{ workshop.instructor.get_full_name|capfirst }}</td>
+                                <td>{{ workshop.workshop_type.name }}</td>
+                                <td>{{ workshop.date|date }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="6" class="text-center text-muted">No workshops found</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">{% include "statistics_app/paginator.html" %}</div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- The Modal -->
-<div id="dialog" title="Workshops Statistics">
-    <canvas id="myChart"></canvas>
+<!-- Chart Modal (Bootstrap) and Data -->
+<div class="modal fade" id="chartModal" tabindex="-1" role="dialog" aria-labelledby="chartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chartModalLabel">Workshops Statistics</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+                    <div class="modal-body">
+                        <canvas id="myChart" style="max-height: 520px;"></canvas>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+    <style>
+        #chartModal .modal-content { background: linear-gradient(160deg, var(--card-bg), var(--card-bg-hover)); color: var(--text-main); }
+        #chartModal .modal-header, #chartModal .modal-footer { border-color: rgba(255,255,255,.08); }
+        #chartModal .close { color: #fff; opacity: .8; }
+        #chartModal .close:hover { opacity: 1; }
+    </style>
+        <!-- Inject data as JSON to avoid JS parse issues -->
+    {{ stats_payload|json_script:"stats-public" }}
+    <script>
+        (function() {
+            var payload = {};
+            try { payload = JSON.parse(document.getElementById('stats-public').textContent || '{}'); } catch(e) { payload = {}; }
+            var chart;
+            function renderChart(labels, data, graph_name, chartType) {
+                var ctx = document.getElementById('myChart').getContext('2d');
+                if (chart) { chart.destroy(); chart = null; }
+                var dataset = { data: data, label: graph_name };
+                var optionsCommon = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: { labels: { fontColor: '#e6e8eb' } }
+                };
+                if (chartType === 'pie') {
+                    dataset.backgroundColor = [
+                        'rgba(77, 163, 255, .9)','rgba(255, 214, 102, .9)','rgba(52, 199, 89, .9)','rgba(255, 138, 62, .9)','rgba(191, 191, 191, .9)'
+                    ];
+                    chart = new Chart(ctx, { type: 'pie', data: { labels: labels, datasets: [dataset] }, options: optionsCommon });
+                } else {
+                    dataset.backgroundColor = 'rgba(77,163,255,.35)';
+                    dataset.borderColor = 'rgba(77,163,255,.85)';
+                    dataset.borderWidth = 1;
+                    chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: labels, datasets: [dataset] },
+                        options: Object.assign({}, optionsCommon, {
+                            scales: {
+                                yAxes: [{ ticks: { beginAtZero: true, fontColor: '#e6e8eb' } }],
+                                xAxes: [{ ticks: { fontColor: '#e6e8eb' } }]
+                            }
+                        })
+                    });
+                }
+            }
+            function show_graph(labels, data, graph_name, chartType) {
+                $('#chartModalLabel').text(graph_name);
+                // Ensure chart renders after modal is fully visible (sizing works)
+                $('#chartModal').off('shown.bs.modal').on('shown.bs.modal', function () {
+                    renderChart(labels, data, graph_name, chartType);
+                });
+                // Clean up when hidden
+                $('#chartModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+                    if (chart) { chart.destroy(); chart = null; }
+                });
+                $('#chartModal').modal('show');
+            }
+            $('#state_graph').on('click', function() { show_graph(payload.state_labels||[], payload.state_data||[], 'State wise workshops', 'bar'); });
+            $('#type_graph').on('click', function() { show_graph(payload.type_labels||[], payload.type_data||[], 'Type wise workshops', 'pie'); });
+        })();
+    </script>
 </div>
-
-<script type="text/javascript">
-    var state_labels = {{ws_states|safe}};
-    var state_data = {{ws_count|safe}};
-    var type_labels = {{ws_type|safe}};
-    var type_data = {{ws_type_count|safe}};
-    var chart;
-    $("#state_graph").on("click", function() {
-        show_graph(state_labels, state_data, "State wise workshops");
-    });
-    $("#type_graph").on("click", function() {
-        show_graph(type_labels, type_data, "Type wise workshops");
-    });
-
-    function show_graph(labels, data, graph_name, chart_name) {
-        var ctx = document.getElementById('myChart').getContext('2d');
-        if(chart) chart.destroy();
-        chart = new Chart(ctx, {
-            // The type of chart we want to create
-            type: 'bar',
-
-            // The data for our dataset
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    label: graph_name,
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                }]
-            },
-            // Configuration options go here
-            options: {}
-        });
-        $("#dialog").dialog({
-            width: 900,
-            height: 500
-        });
-    }
-</script>
 
 {% endblock %}

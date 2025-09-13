@@ -65,7 +65,7 @@
         </div>
         <br><br>
         <div class="col-md-6 col-md-offset-6">
-            <div class="card border-primary">
+            <div class="card card-dark rounded-xl">
                 <div class="card-header">
                     <h3>Propose Workshop</h3>
                 </div>
@@ -118,4 +118,11 @@
             </div>
         </div>
     </div>
+    <style>
+        /* Dark modal to match theme */
+        #exampleModalCenter .modal-content { background: linear-gradient(160deg, var(--card-bg), var(--card-bg-hover)); color: var(--text-main); }
+        #exampleModalCenter .modal-header, #exampleModalCenter .modal-footer { border-color: rgba(255,255,255,.08); }
+        #exampleModalCenter .close { color: #fff; opacity: .8; }
+        #exampleModalCenter .close:hover { opacity: 1; }
+    </style>
 {% endblock %}

@@ -1,6 +1,7 @@
 import os
 import uuid
 import pandas as pd
+from collections import Counter
 
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
@@ -160,28 +161,27 @@ class AttachmentFile(models.Model):
 class WorkshopManager(models.Manager):
 
     def get_workshops_by_state(self, workshops):
-        w = workshops.values_list("coordinator__profile__state", flat=True)
+        # Collect state codes and count them
+        codes = list(workshops.values_list("coordinator__profile__state", flat=True))
+        # Normalize Nones to empty string so they can be counted and mapped
+        codes = [c or '' for c in codes]
+        counts = Counter(codes)
         states_map = dict(states)
-        df = pd.DataFrame(list(w))
-        data_states, data_counts = [], []
-        if not df.empty:
-            grouped_data = df.value_counts().to_dict()
-            for state, count in grouped_data.items():
-                state_name = state[0]
-                data_states.append(states_map[state_name])
-                data_counts.append(count)
+        # Sort by count desc for a nicer chart order
+        items = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+        # Map state code to display name; fallback to placeholder for unknowns
+        placeholder = states_map.get('', '---------')
+        data_states = [states_map.get(code, placeholder) for code, _ in items]
+        data_counts = [cnt for _, cnt in items]
         return data_states, data_counts
 
     def get_workshops_by_type(self, workshops):
-        w = workshops.values_list("workshop_type__name", flat=True)
-        df = pd.DataFrame(list(w))
-        data_wstypes, data_counts = [], []
-        if not df.empty:
-            grouped_data = df.value_counts().to_dict()
-            for ws, count in grouped_data.items():
-                ws_name = ws[0]
-                data_wstypes.append(ws_name)
-                data_counts.append(count)
+        names = list(workshops.values_list("workshop_type__name", flat=True))
+        names = [n for n in names if n]
+        counts = Counter(names)
+        items = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+        data_wstypes = [name for name, _ in items]
+        data_counts = [cnt for _, cnt in items]
         return data_wstypes, data_counts
 
 

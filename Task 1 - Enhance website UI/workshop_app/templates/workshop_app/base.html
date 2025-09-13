@@ -22,19 +22,15 @@
     <link rel="stylesheet" href="{% static 'workshop_app/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'workshop_app/css/toastr.min.css' %}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'workshop_app/css/base.css' %}" type="text/css"/>
     <link rel="stylesheet" href="{% static 'workshop_app/css/font-awesome.css' %}" type="text/css"/>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <!-- Load our theme last so it overrides vendor defaults -->
+    <link rel="stylesheet" href="{% static 'workshop_app/css/base.css' %}?v=20250913" type="text/css"/>
 
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        main {
-            flex: 1;
-        }
+        /* Keep layout primitives; color/background are defined in base.css */
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        main { flex: 1; }
     </style>
 
     {% block extra-custom-scripts %}{% endblock %}
@@ -51,7 +47,7 @@
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav mx-auto">
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/">Home</a>
+                                    <a class="nav-link" href="{% url 'workshop_app:index' %}">Home</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="{% url 'statistics_app:public' %}">Statistics</a>
@@ -116,19 +112,32 @@
         </div>
     </main>
 
-    <footer class="footer mt-auto py-3" style="background:#000; color:#fff;">
+    <footer class="footer mt-auto py-3">
         <div class="container text-center">
             <span>Developed by FOSSEE group, IIT Bombay</span>
         </div>
     </footer>
 
+    {% if messages %}
+    <div id="django-messages" data-messages='[
+        {% for message in messages %}{"level":"{{ message.tags|default:'info' }}","text":"{{ message|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}
+    ]'></div>
+    {% endif %}
     <script>
-        //these will run server-side using toastr. appears erroneously as client-side otherwise
-        {% if messages %}
-            {% for message in messages %}
-                toastr[{% if message.tags %} "{{ message.tags }}" {% else %} "info" {% endif %}]("{{ message }}");
-            {% endfor %}
-        {% endif %}
+        (function() {
+            var el = document.getElementById('django-messages');
+            if (!el) return;
+            try {
+                var msgs = JSON.parse(el.getAttribute('data-messages') || '[]');
+                msgs.forEach(function(m) {
+                    var lvl = m.level || 'info';
+                    var txt = m.text || '';
+                    if (typeof toastr !== 'undefined' && toastr[lvl]) {
+                        toastr[lvl](txt);
+                    }
+                });
+            } catch(e) { /* swallow */ }
+        })();
     </script>
 </body>
 </html>

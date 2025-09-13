@@ -95,9 +95,21 @@ def workshop_public_stats(request):
     paginator = Paginator(workshops, 30)
     page = request.GET.get('page')
     workshops = paginator.get_page(page)
-    context = {"form": form, "objects": workshops, "ws_states": ws_states,
-               "ws_count": ws_count, "ws_type": ws_type,
-               "ws_type_count": ws_type_count}
+    stats_payload = {
+        "state_labels": ws_states,
+        "state_data": ws_count,
+        "type_labels": ws_type,
+        "type_data": ws_type_count,
+    }
+    context = {
+        "form": form,
+        "objects": workshops,
+        "ws_states": ws_states,
+        "ws_count": ws_count,
+        "ws_type": ws_type,
+        "ws_type_count": ws_type_count,
+        "stats_payload": stats_payload,
+    }
     return render(
         request, 'statistics_app/workshop_public_stats.html', context
     )
