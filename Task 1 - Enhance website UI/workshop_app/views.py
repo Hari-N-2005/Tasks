@@ -56,13 +56,12 @@ def get_landing_page(user):
 
 # View functions
 
+
 def index(request):
-    """Landing Page : Redirect to login page if not logged in
-                      Redirect to respective landing page according to position"""
+    """Landing Page : Show elegant home page if logged in, else redirect to login"""
     user = request.user
     if user.is_authenticated and is_email_checked(user):
-        return redirect(get_landing_page(user))
-
+        return render(request, 'workshop_app/index.html', {"user": user})
     return redirect(reverse('workshop_app:login'))
 
 
@@ -75,7 +74,7 @@ def user_login(request):
     if user.is_superuser:
         return redirect('/admin')
     if user.is_authenticated:
-        return redirect(get_landing_page(user))
+        return redirect(reverse('workshop_app:index'))
 
     if request.method == "POST":
         form = UserLoginForm(request.POST)
@@ -83,7 +82,7 @@ def user_login(request):
             user = form.cleaned_data
             if user.profile.is_email_verified:
                 login(request, user)
-                return redirect(get_landing_page(user))
+                return redirect(reverse('workshop_app:index'))
             else:
                 return render(request, 'workshop_app/activation.html')
         else:

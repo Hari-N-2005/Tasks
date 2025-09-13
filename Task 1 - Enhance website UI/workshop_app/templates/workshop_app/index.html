@@ -1,0 +1,111 @@
+{% extends 'workshop_app/base.html' %}
+{% block title %}Home | FOSSEE Workshops{% endblock %}
+{% block content %}
+<style>
+    /* Harmonized palette */
+    :root {
+        --bg-start: #1f2327;
+        --bg-end: #2a2f35;
+        --card-bg: #2f3540;
+        --card-bg-hover: #343b47;
+        --card-grad-start: #2f3540;   /* gradient start for main card */
+        --card-grad-end: #3a4250;     /* gradient end for main card */
+        --text-main: #e6e8eb;
+        --text-muted: #b5bac1;
+        --accent: #4da3ff; /* primary */
+        --accent-contrast: #0b1a2b;
+        --accent-warm: #ffd666; /* subtle warm highlight */
+        --success: #34c759;
+        --info: #17a2b8;
+    }
+
+    /* Layered gradient background */
+    body {
+        background-color: var(--bg-start);
+        background-image:
+            radial-gradient(1200px 600px at 10% 0%, rgba(77,163,255,0.12), transparent 60%),
+            radial-gradient(1000px 500px at 90% 10%, rgba(255,214,102,0.10), transparent 60%),
+            linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    .card-dark { 
+        background: linear-gradient(160deg, var(--card-grad-start), var(--card-grad-end)); 
+        color: var(--text-main); 
+        border: 2px solid rgba(255,255,255,.06);
+        border-radius: 25px;
+        padding: 30px;
+    }
+    .text-muted { color: var(--text-muted) !important; }
+    .welcome-animate { animation: fadeInDown 1.0s; }
+    @keyframes fadeInDown { from { opacity:0; transform: translateY(-20px);} to {opacity:1; transform:none;} }
+
+    .feature-icon { font-size: 2.25rem; color: var(--accent); margin-bottom: .5rem; transition: transform .2s ease, color .2s ease; }
+    .feature-card { background: linear-gradient(160deg, var(--card-bg), var(--card-bg-hover)); border: 1px solid rgba(255,255,255,.06); box-shadow: 0 6px 18px rgba(0,0,0,.25); transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(0,0,0,.35); background: var(--card-bg-hover); }
+
+    .btn-theme { background: var(--accent); color: #fff; border: none; }
+    .btn-theme:hover { background: #3b8be6; color: #fff; }
+    .btn-theme-success { background: var(--success); color: #0c1f11; border: none; }
+    .btn-theme-success:hover { filter: brightness(0.95); color:#0c1f11; }
+    .btn-theme-info { background: var(--info); color: #08191d; border: none; }
+    .btn-theme-info:hover { filter: brightness(0.95); color:#08191d; }
+
+    .lead a { color: var(--accent-warm); text-decoration: underline; }
+    .lead a:hover { opacity: .9; }
+
+    .display-title { font-weight: 800; font-size: clamp(2rem, 6vw, 3.25rem); }
+</style>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-lg border-0 card-dark">
+                <div class="card-body text-center">
+                    <h1 class="display-title mb-3 welcome-animate">
+                        <span style="color: var(--accent-warm);">Welcome</span>
+                        {% if user.is_authenticated %} {{ user.get_full_name|title }}{% endif %}
+                    </h1>
+                    <p class="lead mb-4 text-muted">Your one-stop portal for managing and proposing <span style="color:var(--accent-warm);">FOSSEE Workshops</span>.<br>
+                        Stay updated, track your workshops, and explore new opportunities!</p>
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 rounded feature-card h-100">
+                                <div class="feature-icon"><i class="fa fa-calendar-check-o"></i></div>
+                                <h5>Workshop Status</h5>
+                                <p class="small text-muted">View and manage your upcoming and past workshops.</p>
+                                <a href="{% url 'workshop_app:workshop_status_instructor' %}" class="btn btn-theme btn-block">Go</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 rounded feature-card h-100">
+                                <div class="feature-icon"><i class="fa fa-lightbulb-o"></i></div>
+                                <h5>Propose Workshop</h5>
+                                <p class="small text-muted">Suggest new workshops and expand your impact.</p>
+                                <a href="{% url 'workshop_app:propose_workshop' %}" class="btn btn-theme-success btn-block">Go</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 rounded feature-card h-100">
+                                <div class="feature-icon"><i class="fa fa-list-alt"></i></div>
+                                <h5>Workshop Types</h5>
+                                <p class="small text-muted">Explore available workshop categories and details.</p>
+                                <a href="{% url 'workshop_app:workshop_type_list' %}" class="btn btn-theme-info btn-block">Go</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-info mt-4" style="background: rgba(23,162,184,.12); color: var(--text-main); border: 1px solid rgba(23,162,184,.35);">
+                        <strong>Tip:</strong> Use the navigation bar to access your profile, statistics, and more.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning mt-4" style="background: rgba(255,214,102,.12); color: var(--text-main); border: 1px solid rgba(255,214,102,.35);">
+                        <strong>New here?</strong> <a href="{% url 'workshop_app:register' %}">Sign up</a> to get started!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
