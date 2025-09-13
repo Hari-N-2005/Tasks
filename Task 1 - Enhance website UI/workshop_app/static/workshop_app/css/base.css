@@ -139,13 +139,11 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0
     z-index: 1000;
 }
 .footer {
-    position: fixed;
-    bottom: 0;
+    position: static; /* not fixed: allow natural flow */
     width: 100%;
     background-color: #000;
     color: #fff;
     text-align: center;
-    z-index: 100;
 }
 .base-content {
     padding-top: 5em;
@@ -179,3 +177,56 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0
     color: var(--text-main) !important;
 }
 .dropdown-divider { border-top-color: rgba(255,255,255,.12); }
+
+/*
+ * Mobile Drawer (off-canvas left)
+ * Only visible on small screens (we rely on d-lg-none classes in markup)
+ */
+@media (max-width: 991.98px) {
+    .mobile-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        transform: translateX(-100%);
+        transition: transform .25s ease-out;
+        background: linear-gradient(160deg, var(--card-grad-start), var(--card-grad-end));
+        border-right: 1px solid rgba(255,255,255,.12);
+        z-index: 1050; /* above navbar */
+        color: var(--text-main);
+        box-shadow: 4px 0 16px rgba(0,0,0,.4);
+    }
+    .mobile-drawer.open { transform: translateX(0); }
+    .mobile-drawer .nav-link { padding: .6rem 1rem; }
+    .mobile-drawer .nav-link:hover { background: rgba(255,255,255,.06); border-radius: 8px; }
+
+    .mobile-drawer-header { border-bottom: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.15); }
+    .mobile-drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease-in-out;
+        z-index: 1040;
+    }
+    .mobile-drawer-backdrop.show { opacity: 1; pointer-events: auto; }
+
+        /* Statistics: align chart buttons under title on mobile */
+        .charts-header { flex-wrap: wrap; }
+        .charts-title { width: 100%; margin-bottom: 2.25rem; }
+        .charts-actions { width: 100%; display: flex; gap: .5rem; }
+        .charts-actions .btn { flex: 1 1 auto; margin-right: 0 !important; }
+
+        /* Navbar profile dropdown: overlay without expanding navbar */
+        .navbar .navbar-nav { position: relative; }
+        .navbar .navbar-nav .dropdown-menu {
+            position: absolute !important;
+            right: 0;
+            left: auto;
+            top: calc(100% + .25rem);
+            float: none;
+            z-index: 1100; /* above navbar */
+        }
+}

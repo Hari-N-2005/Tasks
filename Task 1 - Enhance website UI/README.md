@@ -18,42 +18,108 @@
     > Instructors can Accept, Reject or Delete workshops based on their preference, also they can postpone a workshop based on coordinators request.
 
 
-## Recent UI/UX and Template Improvements (2025)
+## 2025 UI Refresh – What Changed
 
-### General
-- Upgraded the overall UI to use modern Bootstrap layouts for a clean, responsive experience.
-- Improved alignment and spacing for all forms and navigation elements.
-- Ensured all pages are mobile-friendly and visually consistent.
+This pass focused on a cohesive dark theme, mobile usability, and polishing high-traffic pages while keeping existing behavior intact.
 
-### Navbar
-- Moved the "FOSSEE Workshops" title to the left.
-- Centered navigation tabs: Home, Statistics, Workshop Status, Propose Workshop, Workshop Types.
-- Moved the profile icon and dropdown to the right.
-- Cleaned up dropdown menu for user actions.
+### Global theme
+- Introduced a dark, layered gradient theme and centralized styling in `workshop_app/static/workshop_app/css/base.css` (loaded last).
+- New utilities and components:
+    - `card-dark` (gradient cards with subtle border/shadow)
+    - `rounded-xl` (softer 28px radii)
+    - `table-soft` (subtle borders and separators)
+    - Dark forms, buttons, alerts, dropdown menus
+- Footer is no longer fixed; it sits at the bottom naturally via the layout flex column.
 
-### Registration Page
-- Refactored the registration form to use Bootstrap form groups and full-width fields.
-- Added tooltips and clear labels for better usability.
-- Ensured all fields are vertically aligned and responsive.
+### Navigation (desktop unchanged, mobile improved)
+- Desktop: brand on the left, nav in the center, profile menu on the right.
+- Mobile:
+    - Added a left-side hamburger button that opens a slide-out drawer (off-canvas) with all nav links.
+    - Username is hidden to avoid overlap; only the profile icon shows.
+    - Profile dropdown opens as an overlay and no longer expands the navbar.
 
-### Login Page
-- Improved form layout and error display.
-- Restored the "Sign up" link for new users.
-- Enhanced button and input styling for clarity.
+### Statistics – Public page
+- Charts open in a Bootstrap modal (bar for state, pie for type) to avoid in-card sizing glitches.
+- Data is injected via `json_script` to avoid inline template parsing issues.
+- Chart rendering is deferred until the modal is shown and is cleaned up on close.
+- Mobile refinements:
+    - “Charts” title uses responsive spacing (`mb-2 mb-lg-0`).
+    - Buttons wrap under the title on small screens with clear spacing and equal widths.
 
-### Profile Edit Page
-- Redesigned the profile edit form with a card layout, clear labels, and improved spacing.
-- Kept the update functionality unchanged for seamless user experience.
+### Workshop Status pages
+- Both Instructor and Coordinator views were refreshed:
+    - Dark cards, improved table readability, consistent badges/buttons.
+    - Better empty/edge states without changing page behavior.
 
-### Navigation Tabs
-- Moved "Workshop Status", "Propose Workshop", and "Workshop Types" tabs out of the profile dropdown and back to the main navigation bar.
+### Workshop Types list
+- Wrapped table in a dark card with a visible but soft border.
+- Removed row hover greying; switched to subtle striped rows.
+- Replaced multiple `<tbody>` blocks with a single one to eliminate a thick separator line.
+- Pagination spacing cleaned up.
 
-### Template Filters
-- Added custom template filters (e.g., `add_class`, `has_group`) for improved form field styling and group checks in templates.
+### Propose Workshop
+- The note/alert uses a theme-matching blue and is readable on the dark background.
+- Increased card radius using `rounded-xl` and themed the modal dark.
 
-### Bug Fixes
-- Fixed template errors related to missing filters and incorrect URL names.
-- Updated template tag order to resolve Django template syntax errors.
+### Backend/statistics data fixes
+- Rewrote aggregation to avoid pandas edge cases and produce correct chart data:
+    - `WorkshopManager.get_workshops_by_state()` and `.get_workshops_by_type()` now use `collections.Counter`, sort outputs, and account for unknown/empty states.
+- Views pass a `stats_payload` dict to templates and render it via `json_script`.
+
+### Polished defaults
+- Toastr messages are queued from the base template using a JSON data attribute.
+- Dropdowns, alerts, tables, and forms have consistent dark styling across the site.
 
 ---
-For more details on setup and usage, see docs/Getting_Started.md.
+
+## Developer notes (file touchpoints)
+
+- `workshop_app/templates/workshop_app/base.html`
+    - Ensures theme CSS loads last; adds mobile hamburger and off‑canvas menu (#mobileDrawer), backdrop, and small JS controller.
+    - Hides username on mobile (`d-none d-lg-inline`) and overlays the profile dropdown.
+- `workshop_app/static/workshop_app/css/base.css`
+    - Core theme variables, dark components, utilities, and mobile drawer styles.
+    - Mobile rules for charts header layout and profile dropdown overlay.
+    - Footer changed to non‑fixed.
+- `statistics_app/templates/statistics_app/workshop_public_stats.html`
+    - Charts header made responsive; buttons moved to a modal workflow; uses `json_script` for data.
+- `statistics_app/templates/statistics_app/paginator.html`
+    - Compact, theme-consistent pagination.
+- `workshop_app/models.py`
+    - Counter-based stats aggregation for state/type.
+- `statistics_app/views.py`
+    - Provides `stats_payload` to the public statistics page.
+- `workshop_app/templates/workshop_app/workshop_status_instructor.html`
+- `workshop_app/templates/workshop_app/workshop_status_coordinator.html`
+    - Refreshed to the dark card/table style and improved readability.
+- `workshop_app/templates/workshop_app/propose_workshop.html`
+    - Themed alert/modal and increased card radius.
+- `workshop_app/templates/workshop_app/workshop_type_list.html`
+    - Dark card wrapper, softer separators, single `<tbody>`, and cleaned classes.
+- `workshop_app/templates/workshop_app/partials/nav_items.html` (new)
+    - Single source of truth for nav links shared by the top bar and mobile drawer.
+
+---
+
+## Quick start 
+
+1) Install dependencies
+
+```bat
+pip install -r requirements.txt
+```
+
+2) Run migrations and start the server
+
+```bat
+python manage.py migrate
+python manage.py runserver
+```
+
+3) Visit the app
+
+- http://127.0.0.1:8000/
+- Public statistics: http://127.0.0.1:8000/statistics/public
+
+
+For detailed setup, see `docs/Getting_Started.md`.

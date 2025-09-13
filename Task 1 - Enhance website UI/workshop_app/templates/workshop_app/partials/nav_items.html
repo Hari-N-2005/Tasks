@@ -1,0 +1,11 @@
+{# Shared nav items list; used in top navbar and mobile drawer #}
+{% load custom_filters %}
+<li class="nav-item"><a class="nav-link" href="{% url 'workshop_app:index' %}">Home</a></li>
+<li class="nav-item"><a class="nav-link" href="{% url 'statistics_app:public' %}">Statistics</a></li>
+{% if user.is_authenticated %}
+  <li class="nav-item"><a class="nav-link" href="{% url 'workshop_app:workshop_status_instructor' %}">Workshop Status</a></li>
+  {% if not request.user|has_group:"instructor" %}
+    <li class="nav-item"><a class="nav-link" href="{% url 'workshop_app:propose_workshop' %}">Propose Workshop</a></li>
+  {% endif %}
+  <li class="nav-item"><a class="nav-link" href="{% url 'workshop_app:workshop_type_list' %}">Workshop Types</a></li>
+{% endif %}
